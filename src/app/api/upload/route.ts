@@ -18,9 +18,7 @@ export async function POST(req: Request) {
 
     // Process depending on file type
     if (file.type === 'application/pdf') {
-      // Dynamic import to avoid Turbopack ESM issues with pdf-parse
-      const pdfModule: any = await import('pdf-parse');
-      const pdfParse = pdfModule.default || pdfModule;
+      const pdfParse = require('pdf-parse');
       const arrayBuffer = await file.arrayBuffer();
       const buffer = Buffer.from(arrayBuffer);
       const pdfData = await pdfParse(buffer);
