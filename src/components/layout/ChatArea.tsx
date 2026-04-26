@@ -416,6 +416,37 @@ function ActionBar({ data, onActionClick }: { data: StructuredResponse, onAction
     localStorage.setItem('finpilot_saved', JSON.stringify(savedAnswers));
   };
 
+  const { user } = useUser();
+
+  const submitFeedback = async (type: 'up' | 'down') => {
+    if (!user?.id) return;
+    
+    // Toggle off if clicking the same one
+    if (feedback === type) {
+      setFeedback(null);
+      return;
+    }
+    
+    setFeedback(type);
+
+    try {
+      await fetch('/api/feedback', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userId: user.id,
+          chatId: null, // Would be passed down if tracked specifically
+          module: 'general', // Default or passed down
+          topicTitle: data.title,
+          confidenceScore: data.confidence,
+          feedbackType: type
+        })
+      });
+    } catch (err) {
+      console.error('Failed to submit feedback:', err);
+    }
+  };
+
   return (
     <div className="mt-6 space-y-4">
       {/* Correction Loops */}
@@ -447,13 +478,13 @@ function ActionBar({ data, onActionClick }: { data: StructuredResponse, onAction
         <div className="flex items-center gap-4 text-sm text-[var(--color-text-muted)]">
           <span>Was this answer helpful?</span>
           <button
-            onClick={() => setFeedback(feedback === 'up' ? null : 'up')}
+            onClick={() => submitFeedback('up')}
             className={`transition-colors ${feedback === 'up' ? 'text-green-400' : 'hover:text-white'}`}
           >
             <ThumbsUp className="w-4 h-4" />
           </button>
           <button
-            onClick={() => setFeedback(feedback === 'down' ? null : 'down')}
+            onClick={() => submitFeedback('down')}
             className={`transition-colors ${feedback === 'down' ? 'text-red-400' : 'hover:text-white'}`}
           >
             <ThumbsDown className="w-4 h-4" />
