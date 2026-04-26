@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useUser } from "@clerk/nextjs";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { Topbar } from "@/components/layout/Topbar";
@@ -8,6 +8,7 @@ import { ChatArea } from "@/components/layout/ChatArea";
 import { InputBar } from "@/components/layout/InputBar";
 import { RightPanel } from "@/components/layout/RightPanel";
 import { UserContextModal } from "@/components/onboarding/UserContextModal";
+import { HomeDashboard } from "@/components/layout/HomeDashboard";
 
 export type StructuredResponse = {
   title: string;
@@ -40,8 +41,11 @@ export type ChatSession = {
 export type Module = 'general' | 'accounting' | 'reporting' | 'laws' | 'taxation' | 'fpa' | 'treasury';
 export type Mode = 'standard' | 'expert';
 
+export type ViewState = 'home' | 'chat';
+
 export default function Home() {
   const { user } = useUser();
+  const [view, setView] = useState<ViewState>('home');
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [chatId, setChatId] = useState<string | null>(null);
@@ -98,9 +102,18 @@ export default function Home() {
     setChatId(null);
     setMessages([]);
     setLastResponse(null);
+    setView('chat');
+  };
+
+  const handleGoHome = () => {
+    setView('home');
+    setChatId(null);
+    setMessages([]);
+    setLastResponse(null);
   };
 
   const handleSelectChat = async (id: string) => {
+    setView('chat');
     setChatId(id);
     setMessages([]);
     setLastResponse(null);
@@ -115,7 +128,6 @@ export default function Home() {
           content: m.role === 'assistant' && typeof m.content === 'object' ? m.content : (m.content?.text || m.content || ''),
         }));
         setMessages(loaded);
-        // Set last response for right panel
         const lastAssistant = loaded.filter(m => m.role === 'assistant').pop();
         if (lastAssistant && typeof lastAssistant.content !== 'string') {
           setLastResponse(lastAssistant.content as StructuredResponse);
@@ -143,6 +155,11 @@ export default function Home() {
   const handleSendMessage = async (text: string) => {
     if (!text.trim()) return;
 
+    // Switch to chat view if on home
+    if (view === 'home') {
+      setView('chat');
+    }
+
     const userMessage: Message = {
       id: Date.now().toString(),
       role: 'user',
@@ -152,14 +169,12 @@ export default function Home() {
     setMessages((prev) => [...prev, userMessage]);
     setIsLoading(true);
 
-    // Create chat if first message
     let activeChatId = chatId;
     if (!activeChatId) {
       activeChatId = await createNewChat(text);
     }
 
     try {
-      // Save user message to DB
       if (activeChatId) {
         saveMessage(activeChatId, 'user', { text });
       }
@@ -185,7 +200,6 @@ export default function Home() {
       }
       const data: StructuredResponse = await res.json();
 
-      // Validate that we got a proper structured response
       if (!data.title && !data.summary) {
         throw new Error('Received an empty response from the AI');
       }
@@ -199,13 +213,11 @@ export default function Home() {
       setMessages((prev) => [...prev, aiMessage]);
       setLastResponse(data);
 
-      // Save assistant message to DB
       if (activeChatId) {
         saveMessage(activeChatId, 'assistant', data);
       }
     } catch (error: any) {
       console.error('Chat error:', error);
-      // Show the error as an assistant message so the user sees it
       const errorMessage: Message = {
         id: (Date.now() + 1).toString(),
         role: 'assistant',
@@ -228,6 +240,15 @@ export default function Home() {
     }
   };
 
+  const handleDashboardChat = (prompt: string) => {
+    setView('chat');
+    setChatId(null);
+    setMessages([]);
+    setLastResponse(null);
+    // Use setTimeout to allow the view to switch before sending
+    setTimeout(() => handleSendMessage(prompt), 100);
+  };
+
   const handleUploadTrigger = () => {
     fileInputRef.current?.click();
   };
@@ -240,10 +261,8 @@ export default function Home() {
         activeChatId={chatId}
         onNewChat={handleNewChat}
         onSelectChat={handleSelectChat}
-        selectedModule={selectedModule}
-        onSelectModule={setSelectedModule}
-        mode={mode}
-        onSetMode={setMode}
+        onGoHome={handleGoHome}
+        isHomeView={view === 'home'}
       />
       <div className="flex-1 flex flex-col min-w-0">
         <Topbar
@@ -254,15 +273,21 @@ export default function Home() {
           onUpload={handleUploadTrigger}
         />
         <div className="flex-1 flex min-h-0">
-          <div className="flex-1 flex flex-col min-w-0 border-r border-[var(--color-border-subtle)]">
-            <ChatArea messages={messages} isLoading={isLoading} onActionClick={handleSendMessage} />
-            <InputBar
-              onSendMessage={handleSendMessage}
-              isLoading={isLoading}
-              fileInputRef={fileInputRef}
-            />
-          </div>
-          <RightPanel lastResponse={lastResponse} />
+          {view === 'home' ? (
+            <HomeDashboard onStartChat={handleDashboardChat} />
+          ) : (
+            <>
+              <div className="flex-1 flex flex-col min-w-0 border-r border-[var(--color-border-subtle)]">
+                <ChatArea messages={messages} isLoading={isLoading} onActionClick={handleSendMessage} />
+                <InputBar
+                  onSendMessage={handleSendMessage}
+                  isLoading={isLoading}
+                  fileInputRef={fileInputRef}
+                />
+              </div>
+              <RightPanel lastResponse={lastResponse} />
+            </>
+          )}
         </div>
       </div>
     </div>

@@ -3,219 +3,134 @@
 import {
   MessageSquarePlus,
   Home,
-  History,
-  BookOpen,
-  UploadCloud,
-  Bookmark,
-  Calculator,
-  FileText,
-  Scale,
-  Landmark,
-  TrendingUp,
-  Briefcase,
-  Settings,
+  MessageSquare,
   ChevronDown,
-  MessageSquare
+  Settings,
+  TrendingUp,
 } from "lucide-react";
 import { UserButton, useUser } from "@clerk/nextjs";
-import { ChatSession, Module, Mode } from "@/app/page";
-import { useState } from "react";
+import { ChatSession } from "@/app/page";
 
 interface SidebarProps {
   chatHistory: ChatSession[];
   activeChatId: string | null;
   onNewChat: () => void;
   onSelectChat: (id: string) => void;
-  selectedModule: Module;
-  onSelectModule: (m: Module) => void;
-  mode: Mode;
-  onSetMode: (m: Mode) => void;
+  onGoHome: () => void;
+  isHomeView: boolean;
 }
 
 export function Sidebar({
   chatHistory, activeChatId, onNewChat, onSelectChat,
-  selectedModule, onSelectModule, mode, onSetMode
+  onGoHome, isHomeView
 }: SidebarProps) {
   const { user } = useUser();
-  const [showHistory, setShowHistory] = useState(false);
 
-  const modules: { key: Module; label: string; icon: React.ReactNode }[] = [
-    { key: 'accounting', label: 'Accounting', icon: <Calculator className="w-5 h-5 text-green-500" /> },
-    { key: 'reporting', label: 'Financial Reporting', icon: <FileText className="w-5 h-5 text-blue-400" /> },
-    { key: 'laws', label: 'Laws & Compliance', icon: <Scale className="w-5 h-5 text-indigo-400" /> },
-    { key: 'taxation', label: 'Taxation', icon: <Landmark className="w-5 h-5 text-red-400" /> },
-    { key: 'fpa', label: 'FP&A', icon: <TrendingUp className="w-5 h-5 text-yellow-500" /> },
-    { key: 'treasury', label: 'Treasury', icon: <Briefcase className="w-5 h-5 text-purple-400" /> },
-  ];
+  // Group chats by date
+  const today = new Date();
+  const todayStr = today.toDateString();
+  const yesterdayStr = new Date(today.getTime() - 86400000).toDateString();
+
+  const groups: { label: string; chats: ChatSession[] }[] = [];
+  const todayChats = chatHistory.filter(c => new Date(c.created_at).toDateString() === todayStr);
+  const yesterdayChats = chatHistory.filter(c => new Date(c.created_at).toDateString() === yesterdayStr);
+  const olderChats = chatHistory.filter(c => {
+    const d = new Date(c.created_at).toDateString();
+    return d !== todayStr && d !== yesterdayStr;
+  });
+  if (todayChats.length) groups.push({ label: 'Today', chats: todayChats });
+  if (yesterdayChats.length) groups.push({ label: 'Yesterday', chats: yesterdayChats });
+  if (olderChats.length) groups.push({ label: 'Earlier', chats: olderChats });
 
   return (
     <aside className="w-64 bg-[var(--color-bg-sidebar)] border-r border-[var(--color-border-subtle)] flex flex-col h-full shrink-0">
-      {/* Header Logo */}
-      <div className="h-16 flex items-center px-6">
+      {/* Header */}
+      <div className="h-16 flex items-center justify-between px-5">
         <div className="flex items-center gap-2 text-[var(--color-brand-500)] font-semibold text-xl">
           <TrendingUp className="w-6 h-6" />
           <span className="text-white">FinPilot</span>
         </div>
-      </div>
-
-      <div className="flex-1 overflow-y-auto px-4 py-4 space-y-6">
-        {/* New Chat Button */}
+        {/* Circular New Chat Button */}
         <button
           onClick={onNewChat}
-          className="w-full bg-[var(--color-brand-600)] hover:bg-[var(--color-brand-500)] text-white rounded-lg py-2.5 px-4 flex items-center justify-center gap-2 font-medium transition-colors"
+          title="New Chat"
+          className="w-9 h-9 rounded-full bg-[var(--color-brand-600)] hover:bg-[var(--color-brand-500)] text-white flex items-center justify-center transition-all hover:scale-105 shadow-lg shadow-[var(--color-brand-600)]/20"
         >
-          <MessageSquarePlus className="w-5 h-5" />
-          New Chat
+          <MessageSquarePlus className="w-4 h-4" />
         </button>
+      </div>
 
-        {/* Main Nav */}
-        <nav className="space-y-1">
-          <NavItem
-            icon={<Home className="w-5 h-5" />}
-            label="Home"
-            active={!showHistory}
-            onClick={() => { setShowHistory(false); onNewChat(); }}
-          />
-          <NavItem
-            icon={<History className="w-5 h-5" />}
-            label="Chat History"
-            active={showHistory}
-            onClick={() => setShowHistory(!showHistory)}
-          />
-        </nav>
+      {/* Home Button */}
+      <div className="px-3 mb-2">
+        <button
+          onClick={onGoHome}
+          className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all ${
+            isHomeView
+              ? "bg-gradient-to-r from-[var(--color-brand-600)]/20 to-transparent text-white border border-[var(--color-brand-500)]/30"
+              : "text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-hover)] hover:text-white"
+          }`}
+        >
+          <Home className="w-5 h-5" />
+          Home Dashboard
+        </button>
+      </div>
 
-        {/* Chat History List */}
-        {showHistory && (
-          <div className="space-y-1 ml-2 max-h-48 overflow-y-auto">
-            {chatHistory.length === 0 ? (
-              <p className="text-xs text-[var(--color-text-muted)] px-2 py-1">No chats yet</p>
-            ) : (
-              chatHistory.map((chat) => (
-                <button
-                  key={chat.id}
-                  onClick={() => onSelectChat(chat.id)}
-                  className={`w-full text-left flex items-center gap-2 px-2 py-1.5 rounded-md text-xs transition-colors truncate ${
-                    chat.id === activeChatId
-                      ? 'bg-[var(--color-bg-panel)] text-white'
-                      : 'text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-hover)] hover:text-white'
-                  }`}
-                >
-                  <MessageSquare className="w-3.5 h-3.5 shrink-0" />
-                  <span className="truncate">{chat.title}</span>
-                </button>
-              ))
-            )}
+      {/* Chat History */}
+      <div className="flex-1 overflow-y-auto px-3 pb-4">
+        <div className="flex items-center justify-between px-2 mb-3">
+          <h3 className="text-[10px] font-semibold text-[var(--color-text-muted)] uppercase tracking-wider">
+            Chat History
+          </h3>
+        </div>
+
+        {groups.length === 0 ? (
+          <div className="px-3 py-6 text-center">
+            <MessageSquare className="w-8 h-8 text-[var(--color-text-muted)]/30 mx-auto mb-2" />
+            <p className="text-xs text-[var(--color-text-muted)]">No conversations yet</p>
+            <p className="text-[10px] text-[var(--color-text-muted)]/60 mt-1">Start a new chat to begin</p>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            {groups.map(group => (
+              <div key={group.label}>
+                <p className="text-[10px] font-medium text-[var(--color-text-muted)] uppercase tracking-wider px-2 mb-1.5">
+                  {group.label}
+                </p>
+                <div className="space-y-0.5">
+                  {group.chats.map(chat => (
+                    <button
+                      key={chat.id}
+                      onClick={() => onSelectChat(chat.id)}
+                      className={`w-full text-left flex items-center gap-2.5 px-3 py-2 rounded-lg text-[13px] transition-all truncate group ${
+                        chat.id === activeChatId
+                          ? 'bg-[var(--color-bg-panel)] text-white shadow-sm'
+                          : 'text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-hover)] hover:text-white'
+                      }`}
+                    >
+                      <MessageSquare className={`w-3.5 h-3.5 shrink-0 ${chat.id === activeChatId ? 'text-[var(--color-brand-500)]' : 'text-[var(--color-text-muted)] group-hover:text-[var(--color-brand-500)]'}`} />
+                      <span className="truncate">{chat.title}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            ))}
           </div>
         )}
-
-        {/* Modules */}
-        <div>
-          <h3 className="text-xs font-semibold text-[var(--color-text-muted)] uppercase tracking-wider mb-3 px-2">
-            Modules
-          </h3>
-          <nav className="space-y-1">
-            {modules.map((mod) => (
-              <NavItem
-                key={mod.key}
-                icon={mod.icon}
-                label={mod.label}
-                active={selectedModule === mod.key}
-                onClick={() => onSelectModule(mod.key)}
-              />
-            ))}
-          </nav>
-        </div>
-
-        {/* Mode Toggle */}
-        <div>
-          <h3 className="text-xs font-semibold text-[var(--color-text-muted)] uppercase tracking-wider mb-3 px-2">
-            Mode
-          </h3>
-          <div className="space-y-2">
-            <ModeOption
-              title="Standard Mode"
-              active={mode === 'standard'}
-              onClick={() => onSetMode('standard')}
-            />
-            <ModeOption
-              title="Expert Mode"
-              subtitle="With citations & in-depth insights"
-              active={mode === 'expert'}
-              onClick={() => onSetMode('expert')}
-            />
-          </div>
-        </div>
-
-        {/* Settings */}
-        <div>
-          <h3 className="text-xs font-semibold text-[var(--color-text-muted)] uppercase tracking-wider mb-3 px-2">
-            Settings
-          </h3>
-          <nav className="space-y-1">
-            <div className="flex items-center justify-between px-2 py-2 text-sm text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-hover)] rounded-md cursor-pointer">
-              <div className="flex items-center gap-3">
-                <Settings className="w-5 h-5" />
-                <span>Jurisdiction</span>
-              </div>
-              <span className="flex items-center gap-1 text-white">
-                <span className="w-4 h-4 rounded-full bg-orange-500 flex items-center justify-center text-[8px]">IN</span>
-                India
-              </span>
-            </div>
-          </nav>
-        </div>
       </div>
 
       {/* User Profile */}
-      <div className="p-4 border-t border-[var(--color-border-subtle)]">
-        <div className="flex items-center justify-between p-2 hover:bg-[var(--color-bg-hover)] rounded-md transition-colors">
+      <div className="p-3 border-t border-[var(--color-border-subtle)]">
+        <div className="flex items-center justify-between p-2 hover:bg-[var(--color-bg-hover)] rounded-lg transition-colors">
           <div className="flex items-center gap-3">
             <UserButton />
             <div>
               <p className="text-sm font-medium text-white">{user?.fullName || 'Guest'}</p>
-              <p className="text-xs text-[var(--color-text-muted)]">Pro Plan</p>
+              <p className="text-[10px] text-[var(--color-text-muted)]">Pro Plan</p>
             </div>
           </div>
-          <ChevronDown className="w-4 h-4 text-[var(--color-text-muted)] cursor-pointer" />
+          <Settings className="w-4 h-4 text-[var(--color-text-muted)] cursor-pointer hover:text-white transition-colors" />
         </div>
       </div>
     </aside>
-  );
-}
-
-function NavItem({ icon, label, active, onClick }: { icon: React.ReactNode; label: string; active?: boolean; onClick?: () => void }) {
-  return (
-    <button
-      onClick={onClick}
-      className={`w-full flex items-center gap-3 px-2 py-2 rounded-md text-sm transition-colors ${
-        active
-          ? "bg-[var(--color-bg-panel)] text-white"
-          : "text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-hover)] hover:text-white"
-      }`}
-    >
-      {icon}
-      {label}
-    </button>
-  );
-}
-
-function ModeOption({ title, subtitle, active, onClick }: { title: string; subtitle?: string; active?: boolean; onClick?: () => void }) {
-  return (
-    <div
-      onClick={onClick}
-      className={`p-3 rounded-lg border cursor-pointer transition-all ${
-        active
-          ? "border-[var(--color-brand-500)] bg-[var(--color-bg-panel)]"
-          : "border-transparent hover:border-[var(--color-border-default)] hover:bg-[var(--color-bg-hover)]"
-      }`}
-    >
-      <div className="flex items-center gap-2">
-        <div className={`w-4 h-4 rounded-full border ${active ? "border-[var(--color-brand-500)]" : "border-[var(--color-text-muted)]"} flex items-center justify-center`}>
-          {active && <div className="w-2 h-2 rounded-full bg-[var(--color-brand-500)]" />}
-        </div>
-        <span className={`text-sm font-medium ${active ? "text-white" : "text-[var(--color-text-secondary)]"}`}>{title}</span>
-      </div>
-      {subtitle && <p className="text-xs text-[var(--color-text-muted)] ml-6 mt-1">{subtitle}</p>}
-    </div>
   );
 }
