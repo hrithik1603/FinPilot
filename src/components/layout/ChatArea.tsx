@@ -5,7 +5,7 @@ import { Bookmark, Copy, Share, ThumbsUp, ThumbsDown } from "lucide-react";
 import { Message, StructuredResponse } from "@/app/page";
 import { useUser } from "@clerk/nextjs";
 
-export function ChatArea({ messages, isLoading }: { messages: Message[], isLoading: boolean }) {
+export function ChatArea({ messages, isLoading, onActionClick }: { messages: Message[], isLoading: boolean, onActionClick?: (action: string) => void }) {
   const { user } = useUser();
   const userInitials = user?.firstName?.[0] || 'U';
   const bottomRef = useRef<HTMLDivElement>(null);
@@ -53,7 +53,7 @@ export function ChatArea({ messages, isLoading }: { messages: Message[], isLoadi
                     animate={msg.id === lastMessageId}
                   />
                   
-                  <ActionBar data={msg.content as StructuredResponse} />
+                  <ActionBar data={msg.content as StructuredResponse} onActionClick={onActionClick} />
                 </div>
               </>
             )}
@@ -363,7 +363,7 @@ function Block({ title, icon, children }: { title: string; icon: string; childre
 }
 
 // ─── Action Bar ───────────────────────────────────────────────────
-function ActionBar({ data }: { data: StructuredResponse }) {
+function ActionBar({ data, onActionClick }: { data: StructuredResponse, onActionClick?: (action: string) => void }) {
   const [feedback, setFeedback] = useState<'up' | 'down' | null>(null);
   const [copied, setCopied] = useState(false);
   const [saved, setSaved] = useState(false);
@@ -417,36 +417,63 @@ function ActionBar({ data }: { data: StructuredResponse }) {
   };
 
   return (
-    <div className="flex items-center justify-between mt-6 pt-4 border-t border-[var(--color-border-subtle)]">
-      <div className="flex items-center gap-4 text-sm text-[var(--color-text-muted)]">
-        <span>Was this answer helpful?</span>
-        <button
-          onClick={() => setFeedback(feedback === 'up' ? null : 'up')}
-          className={`transition-colors ${feedback === 'up' ? 'text-green-400' : 'hover:text-white'}`}
-        >
-          <ThumbsUp className="w-4 h-4" />
-        </button>
-        <button
-          onClick={() => setFeedback(feedback === 'down' ? null : 'down')}
-          className={`transition-colors ${feedback === 'down' ? 'text-red-400' : 'hover:text-white'}`}
-        >
-          <ThumbsDown className="w-4 h-4" />
-        </button>
-      </div>
-      <div className="flex items-center gap-4 text-sm text-[var(--color-text-secondary)]">
-        <button onClick={handleCopy} className="flex items-center gap-1.5 hover:text-white transition-colors">
-          <Copy className="w-4 h-4" />
-          {copied ? 'Copied!' : 'Copy'}
-        </button>
-        <button onClick={handleExport} className="flex items-center gap-1.5 hover:text-white transition-colors">
-          <Share className="w-4 h-4" /> Export
-        </button>
-        <button
-          onClick={handleSave}
-          className={`flex items-center gap-1.5 transition-colors ${saved ? 'text-yellow-400' : 'hover:text-white'}`}
-        >
-          <Bookmark className="w-4 h-4" /> {saved ? 'Saved' : 'Save'}
-        </button>
+    <div className="mt-6 space-y-4">
+      {/* Correction Loops */}
+      {onActionClick && (
+        <div className="flex flex-wrap gap-2 pt-2 border-t border-[var(--color-border-subtle)]">
+          <button 
+            onClick={() => onActionClick('Simplify this answer')}
+            className="text-xs px-3 py-1.5 rounded-full bg-[var(--color-bg-panel)] border border-[var(--color-border-default)] hover:bg-[var(--color-brand-600)] transition-colors"
+          >
+            Simplify
+          </button>
+          <button 
+            onClick={() => onActionClick('Make this more practical')}
+            className="text-xs px-3 py-1.5 rounded-full bg-[var(--color-bg-panel)] border border-[var(--color-border-default)] hover:bg-[var(--color-brand-600)] transition-colors"
+          >
+            Make Practical
+          </button>
+          <button 
+            onClick={() => onActionClick('Add more citations and references')}
+            className="text-xs px-3 py-1.5 rounded-full bg-[var(--color-bg-panel)] border border-[var(--color-border-default)] hover:bg-[var(--color-brand-600)] transition-colors"
+          >
+            Add Citations
+          </button>
+        </div>
+      )}
+
+      {/* Utilities */}
+      <div className="flex items-center justify-between pt-2">
+        <div className="flex items-center gap-4 text-sm text-[var(--color-text-muted)]">
+          <span>Was this answer helpful?</span>
+          <button
+            onClick={() => setFeedback(feedback === 'up' ? null : 'up')}
+            className={`transition-colors ${feedback === 'up' ? 'text-green-400' : 'hover:text-white'}`}
+          >
+            <ThumbsUp className="w-4 h-4" />
+          </button>
+          <button
+            onClick={() => setFeedback(feedback === 'down' ? null : 'down')}
+            className={`transition-colors ${feedback === 'down' ? 'text-red-400' : 'hover:text-white'}`}
+          >
+            <ThumbsDown className="w-4 h-4" />
+          </button>
+        </div>
+        <div className="flex items-center gap-4 text-sm text-[var(--color-text-secondary)]">
+          <button onClick={handleCopy} className="flex items-center gap-1.5 hover:text-white transition-colors">
+            <Copy className="w-4 h-4" />
+            {copied ? 'Copied!' : 'Copy'}
+          </button>
+          <button onClick={handleExport} className="flex items-center gap-1.5 hover:text-white transition-colors">
+            <Share className="w-4 h-4" /> Export
+          </button>
+          <button
+            onClick={handleSave}
+            className={`flex items-center gap-1.5 transition-colors ${saved ? 'text-yellow-400' : 'hover:text-white'}`}
+          >
+            <Bookmark className="w-4 h-4" /> {saved ? 'Saved' : 'Save'}
+          </button>
+        </div>
       </div>
     </div>
   );

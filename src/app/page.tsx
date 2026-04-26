@@ -229,7 +229,7 @@ export default function Home() {
         />
         <div className="flex-1 flex min-h-0">
           <div className="flex-1 flex flex-col min-w-0 border-r border-[var(--color-border-subtle)]">
-            <ChatArea messages={messages} isLoading={isLoading} />
+            <ChatArea messages={messages} isLoading={isLoading} onActionClick={handleSendMessage} />
             <InputBar
               onSendMessage={handleSendMessage}
               isLoading={isLoading}

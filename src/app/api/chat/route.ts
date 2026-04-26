@@ -70,13 +70,36 @@ export async function POST(req: Request) {
     ];
 
     // 5. Generate structured response
-    const { object } = await generateObject({
+    let { object } = await generateObject({
       model: groq('llama-3.3-70b-versatile'),
       schema: FinPilotResponseSchema,
       system: systemPrompt,
       messages: messages,
       temperature: 0.3,
     });
+
+    // 6. Correction Loop: Verify if confidence is low
+    if (object.confidence === 'low') {
+      console.log('Low confidence detected, triggering verification loop...');
+      const verificationMessages = [
+        ...messages,
+        { role: 'assistant' as const, content: JSON.stringify(object) },
+        { 
+          role: 'user' as const, 
+          content: `You previously stated your confidence was low. Please double-check your facts against the provided context and correct any inaccuracies. Focus on resolving: ${object.correction_hint}` 
+        }
+      ];
+      
+      const retry = await generateObject({
+        model: groq('llama-3.3-70b-versatile'),
+        schema: FinPilotResponseSchema,
+        system: systemPrompt,
+        messages: verificationMessages,
+        temperature: 0.1, // Lower temperature for more analytical verification
+      });
+      
+      object = retry.object;
+    }
 
     // 6. Save memory in background
     if (userId) {
