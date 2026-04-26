@@ -2,18 +2,18 @@ import { z } from 'zod';
 
 export const FinPilotResponseSchema = z.object({
   title: z.string().describe("A concise title for the answer"),
-  summary: z.string().min(1).max(400).describe("A 2-3 sentence executive summary"),
-  detailed_explanation: z.array(z.string()).min(1).max(12).describe("Detailed explanation, where each item is one key point or paragraph"),
+  summary: z.string().describe("A 2-3 sentence executive summary"),
+  detailed_explanation: z.array(z.string()).describe("Detailed explanation, where each item is one key point or paragraph"),
   example: z.object({
     description: z.string().describe("Description of the example"),
-    table_data: z.array(z.record(z.string(), z.any())).describe("Array of row objects. Use descriptive keys as column headers (e.g. 'Particulars', 'Amount')")
-  }).optional().describe("Provide an example with tabular data if relevant"),
-  practical_notes: z.array(z.string()).min(0).max(10).describe("Practical tips, caveats, or compliance notes"),
-  sources: z.array(z.string()).min(0).max(10).describe("Citations or references used. Include URLs from web sources when available"),
+    table_data: z.array(z.record(z.string(), z.string())).describe("Array of row objects with string keys and string values. Use descriptive keys as column headers (e.g. 'Particulars', 'Amount')")
+  }).describe("Provide an example with tabular data if relevant. If no example is needed, return an empty description and empty table_data array."),
+  practical_notes: z.array(z.string()).describe("Practical tips, caveats, or compliance notes"),
+  sources: z.array(z.string()).describe("Citations or references used. Include URLs from web sources when available"),
   confidence: z.enum(['high', 'medium', 'low']).describe("Your confidence level in this answer being factually correct for the Indian context"),
-  needs_clarification: z.boolean().default(false).describe("Set to true if the user's query is too ambiguous and you must ask a follow-up question instead of hallucinating"),
-  out_of_scope: z.boolean().default(false).describe("Set to true if the query is completely unrelated to finance, accounting, or business"),
-  correction_hint: z.string().optional().describe("If confidence is low, briefly explain what part of the answer needs verification")
+  needs_clarification: z.boolean().describe("Set to true if the user's query is too ambiguous and you must ask a follow-up question instead of hallucinating. Otherwise false."),
+  out_of_scope: z.boolean().describe("Set to true if the query is completely unrelated to finance, accounting, or business. Otherwise false."),
+  correction_hint: z.string().describe("If confidence is low, briefly explain what part of the answer needs verification. Otherwise empty string.")
 });
 
 export type FinPilotResponse = z.infer<typeof FinPilotResponseSchema>;

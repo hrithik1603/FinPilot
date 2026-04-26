@@ -13,16 +13,16 @@ export type StructuredResponse = {
   title: string;
   summary: string;
   detailed_explanation: string[];
-  example?: {
+  example: {
     description: string;
-    table_data: any[];
+    table_data: Record<string, string>[];
   };
   practical_notes: string[];
   sources: string[];
   confidence: 'high' | 'medium' | 'low';
-  needs_clarification?: boolean;
-  out_of_scope?: boolean;
-  correction_hint?: string;
+  needs_clarification: boolean;
+  out_of_scope: boolean;
+  correction_hint: string;
 };
 
 export type Message = {
@@ -179,8 +179,16 @@ export default function Home() {
         }),
       });
 
-      if (!res.ok) throw new Error('Failed to fetch response');
+      if (!res.ok) {
+        const errBody = await res.json().catch(() => ({ error: 'Unknown server error' }));
+        throw new Error(errBody.error || `Server returned ${res.status}`);
+      }
       const data: StructuredResponse = await res.json();
+
+      // Validate that we got a proper structured response
+      if (!data.title && !data.summary) {
+        throw new Error('Received an empty response from the AI');
+      }
 
       const aiMessage: Message = {
         id: (Date.now() + 1).toString(),
@@ -195,8 +203,26 @@ export default function Home() {
       if (activeChatId) {
         saveMessage(activeChatId, 'assistant', data);
       }
-    } catch (error) {
-      console.error(error);
+    } catch (error: any) {
+      console.error('Chat error:', error);
+      // Show the error as an assistant message so the user sees it
+      const errorMessage: Message = {
+        id: (Date.now() + 1).toString(),
+        role: 'assistant',
+        content: {
+          title: 'Something went wrong',
+          summary: error.message || 'An unexpected error occurred. Please try again.',
+          detailed_explanation: ['The AI was unable to generate a response. This could be due to a temporary API outage, rate limiting, or a network issue.', 'Please try again in a moment. If the issue persists, try rephrasing your question.'],
+          example: { description: '', table_data: [] },
+          practical_notes: ['Try refreshing the page if the issue continues.'],
+          sources: [],
+          confidence: 'low' as const,
+          needs_clarification: false,
+          out_of_scope: false,
+          correction_hint: '',
+        },
+      };
+      setMessages((prev) => [...prev, errorMessage]);
     } finally {
       setIsLoading(false);
     }
