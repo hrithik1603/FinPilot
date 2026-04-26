@@ -19,12 +19,17 @@ const RESPONSE_SCHEMA_PROMPT = `
 You MUST respond ONLY with valid JSON matching this EXACT structure. ALL fields are required — do not omit any.
 
 {
-  "title": "A concise title for the answer (string, required)",
-  "summary": "A 2-3 sentence executive summary (string, required, max 400 chars)",
-  "detailed_explanation": ["Point 1", "Point 2", "..."],
-  "example": { "description": "Description of the example or empty string", "table_data": [{"Column1": "Value1", "Column2": "Value2"}] },
-  "practical_notes": ["Tip 1", "Tip 2", "..."],
-  "sources": ["Source 1", "URL or reference 2", "..."],
+  "title": "A descriptive title for the answer (string, required)",
+  "summary": "A comprehensive executive summary of the answer (string, required, provide at least 2-3 detailed paragraphs if the topic is complex)",
+  "detailed_explanation": [
+    "Comprehensive point 1 with data and context",
+    "Detailed point 2 explaining the 'why' and 'how'",
+    "Point 3 covering edge cases or regulatory specifics",
+    "..."
+  ],
+  "example": { "description": "A practical scenario or calculation", "table_data": [{"Column1": "Value1", "Column2": "Value2"}] },
+  "practical_notes": ["Actionable step 1", "Compliance tip 2", "Strategic advice 3"],
+  "sources": ["Full Source Name 1", "Official URL 2", "..."],
   "confidence": "high" | "medium" | "low",
   "needs_clarification": false,
   "out_of_scope": false,
@@ -32,10 +37,9 @@ You MUST respond ONLY with valid JSON matching this EXACT structure. ALL fields 
 }
 
 CRITICAL RULES:
-- "detailed_explanation" MUST have at least 1 item. Never return an empty array.
-- "summary" MUST be a non-empty string with at least one complete sentence.
-- "title" MUST be a descriptive title, NOT just "Response".
-- If no example is relevant, set example.description to "" and example.table_data to [].
+- "detailed_explanation" SHOULD be thorough. Aim for 4-7 detailed items for complex queries.
+- "summary" MUST be substantial. Do not use placeholders. Explain the core logic here.
+- "title" MUST be professional and descriptive.
 - Return ONLY the JSON object. No markdown, no code fences, no explanation outside the JSON.`;
 
 // Fallback: use the raw Groq SDK with JSON mode if generateObject fails

@@ -1,8 +1,8 @@
 import { z } from 'zod';
 
 export const FinPilotResponseSchema = z.object({
-  title: z.string().describe("A concise title for the answer"),
-  summary: z.string().describe("A 2-3 sentence executive summary"),
+  title: z.string().describe("A professional and descriptive title for the answer"),
+  summary: z.string().describe("A comprehensive executive summary of the answer, explaining the core logic and conclusions in detail"),
   detailed_explanation: z.array(z.string()).describe("Detailed explanation, where each item is one key point or paragraph"),
   example: z.object({
     description: z.string().describe("Description of the example"),

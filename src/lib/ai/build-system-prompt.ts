@@ -31,8 +31,8 @@ export function buildSystemPrompt(params: {
   };
 
   const modePrompt = mode === 'expert'
-    ? `Respond with detailed reasoning, domain terminology, assumptions, edge cases, and practical implementation notes.`
-    : `Respond in plain language, with clarity first, and avoid unnecessary jargon. Keep it concise.`;
+    ? `Respond with exhaustive reasoning, deep-dive domain terminology, underlying assumptions, nuanced edge cases, and comprehensive practical implementation notes. Be as thorough as possible.`
+    : `Respond in plain language with clear, helpful explanations. Avoid unnecessary jargon but provide a complete answer that covers all parts of the user's query.`;
 
   const contextPrompt = userContext
     ? `\nUser context:\n- Name: ${userContext.name ?? 'Unknown'}\n- Role: ${userContext.role ?? 'Unknown'}\n- Industry: ${userContext.industry ?? 'Unknown'}\n- Company size: ${userContext.companySize ?? 'Unknown'}\n- Country: ${userContext.country ?? 'Unknown'}\n- Preferred detail level: ${userContext.preferredDetailLevel ?? 'Unknown'}\nTailor the answer to this context.`
