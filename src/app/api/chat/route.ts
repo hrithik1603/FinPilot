@@ -6,6 +6,8 @@ import { generateObject } from 'ai';
 import { createGroq } from '@ai-sdk/groq';
 import { FinPilotResponseSchema } from '@/lib/ai/schemas';
 import { buildSystemPrompt } from '@/lib/ai/build-system-prompt';
+import { getUserContext } from '@/lib/user/context';
+import { getRecentTopics, pushRecentTopic } from '@/lib/memory/recent-topics';
 
 const groq = createGroq({
   apiKey: process.env.GROQ_API_KEY,
@@ -13,20 +15,22 @@ const groq = createGroq({
 
 export async function POST(req: Request) {
   try {
-    const { message, history = [], chatId, module = 'general', mode = 'expert' } = await req.json();
+    const { message, history = [], chatId, module = 'general', mode = 'expert', userId } = await req.json();
 
     if (!message) {
       return NextResponse.json({ error: 'Message is required' }, { status: 400 });
     }
 
     // 1. Run embedding + web search in PARALLEL for speed
-    const [queryEmbeddingRes, webContext] = await Promise.all([
+    const [queryEmbeddingRes, webContext, userContext, recentTopics] = await Promise.all([
       ai.models.embedContent({
         model: 'gemini-embedding-2',
         contents: message,
         config: { outputDimensionality: 768 }
       }),
       searchWeb(message),
+      userId ? getUserContext(userId) : Promise.resolve(null),
+      userId ? getRecentTopics(userId) : Promise.resolve([]),
     ]);
 
     const queryEmbedding = queryEmbeddingRes.embeddings![0].values;
@@ -51,6 +55,7 @@ export async function POST(req: Request) {
     const systemPrompt = buildSystemPrompt({
       module,
       mode,
+      userContext: userContext ? { ...userContext, recentTopics } : undefined,
       docContext,
       webContext
     });
@@ -72,6 +77,12 @@ export async function POST(req: Request) {
       messages: messages,
       temperature: 0.3,
     });
+
+    // 6. Save memory in background
+    if (userId) {
+      // Don't await this so it doesn't block the response
+      pushRecentTopic(userId, message).catch(err => console.error('Redis memory error:', err));
+    }
 
     return NextResponse.json(object);
 

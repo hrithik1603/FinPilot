@@ -7,6 +7,7 @@ import { Topbar } from "@/components/layout/Topbar";
 import { ChatArea } from "@/components/layout/ChatArea";
 import { InputBar } from "@/components/layout/InputBar";
 import { RightPanel } from "@/components/layout/RightPanel";
+import { UserContextModal } from "@/components/onboarding/UserContextModal";
 
 export type StructuredResponse = {
   title: string;
@@ -167,6 +168,7 @@ export default function Home() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
+          userId: user?.id,
           message: text,
           module: selectedModule,
           mode,
@@ -206,6 +208,7 @@ export default function Home() {
 
   return (
     <div className="flex h-screen bg-[var(--color-bg-main)] text-white overflow-hidden font-sans">
+      <UserContextModal />
       <Sidebar
         chatHistory={chatHistory}
         activeChatId={chatId}
