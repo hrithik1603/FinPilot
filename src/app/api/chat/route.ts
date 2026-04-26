@@ -165,16 +165,22 @@ export async function POST(req: Request) {
           }
         ];
 
-        const retry = await generateObject({
-          model: groqProvider('llama-3.3-70b-versatile'),
-          schema: FinPilotResponseSchema,
-          system: systemPrompt,
-          messages: verificationMessages,
-          temperature: 0.1,
-        });
-        result = retry.object;
+        try {
+          const retry = await generateObject({
+            model: groqProvider('llama-3.3-70b-versatile'),
+            schema: FinPilotResponseSchema,
+            system: systemPrompt,
+            messages: verificationMessages,
+            temperature: 0.1,
+          });
+          result = retry.object;
+          console.log('Verification loop succeeded');
+        } catch (retryGenErr: any) {
+          console.warn('Verification generateObject failed, trying fallback:', retryGenErr.message);
+          result = await fallbackGroqChat(systemPrompt, verificationMessages);
+        }
       } catch (retryErr: any) {
-        console.warn('Verification retry failed, using original result:', retryErr.message);
+        console.warn('Verification retry failed completely, using original result:', retryErr.message);
         // Keep the original low-confidence result rather than crashing
       }
     }
