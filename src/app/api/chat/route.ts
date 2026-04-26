@@ -14,32 +14,63 @@ const groqProvider = createGroq({
   apiKey: process.env.GROQ_API_KEY,
 });
 
+// Explicit JSON schema for the fallback path (model needs this to produce correct structure)
+const RESPONSE_SCHEMA_PROMPT = `
+You MUST respond ONLY with valid JSON matching this EXACT structure. ALL fields are required — do not omit any.
+
+{
+  "title": "A concise title for the answer (string, required)",
+  "summary": "A 2-3 sentence executive summary (string, required, max 400 chars)",
+  "detailed_explanation": ["Point 1", "Point 2", "..."],
+  "example": { "description": "Description of the example or empty string", "table_data": [{"Column1": "Value1", "Column2": "Value2"}] },
+  "practical_notes": ["Tip 1", "Tip 2", "..."],
+  "sources": ["Source 1", "URL or reference 2", "..."],
+  "confidence": "high" | "medium" | "low",
+  "needs_clarification": false,
+  "out_of_scope": false,
+  "correction_hint": ""
+}
+
+CRITICAL RULES:
+- "detailed_explanation" MUST have at least 1 item. Never return an empty array.
+- "summary" MUST be a non-empty string with at least one complete sentence.
+- "title" MUST be a descriptive title, NOT just "Response".
+- If no example is relevant, set example.description to "" and example.table_data to [].
+- Return ONLY the JSON object. No markdown, no code fences, no explanation outside the JSON.`;
+
 // Fallback: use the raw Groq SDK with JSON mode if generateObject fails
-async function fallbackGroqChat(systemPrompt: string, messages: any[]) {
+async function fallbackGroqChat(systemPrompt: string, messages: Array<{role: string; content: string}>) {
+  console.log('Using fallback Groq SDK path for structured output');
+  const groqMessages = [
+    { role: 'system' as const, content: systemPrompt + '\n\n' + RESPONSE_SCHEMA_PROMPT },
+    ...messages.map(m => ({ role: m.role as 'user' | 'assistant', content: m.content })),
+  ];
   const completion = await groqSdk.chat.completions.create({
     model: 'llama-3.3-70b-versatile',
-    messages: [
-      { role: 'system', content: systemPrompt + '\n\nYou MUST respond with valid JSON matching the schema described in your instructions. All fields are required. Do not omit any field.' },
-      ...messages,
-    ],
+    messages: groqMessages,
     response_format: { type: 'json_object' },
     temperature: 0.3,
   });
 
   const raw = completion.choices[0].message.content;
+  console.log('Fallback raw response length:', raw?.length || 0);
   const parsed = JSON.parse(raw || '{}');
 
   // Fill in defaults for any missing fields
   return {
-    title: parsed.title || 'Response',
-    summary: parsed.summary || '',
-    detailed_explanation: parsed.detailed_explanation || [],
-    example: parsed.example || { description: '', table_data: [] },
-    practical_notes: parsed.practical_notes || [],
-    sources: parsed.sources || [],
-    confidence: parsed.confidence || 'medium',
-    needs_clarification: parsed.needs_clarification || false,
-    out_of_scope: parsed.out_of_scope || false,
+    title: parsed.title || 'FinPilot Response',
+    summary: parsed.summary || 'No summary was generated. Please try again.',
+    detailed_explanation: Array.isArray(parsed.detailed_explanation) && parsed.detailed_explanation.length > 0
+      ? parsed.detailed_explanation
+      : ['The AI generated a response but the detailed explanation was not properly formatted. Please try rephrasing your question.'],
+    example: parsed.example && typeof parsed.example === 'object'
+      ? { description: parsed.example.description || '', table_data: Array.isArray(parsed.example.table_data) ? parsed.example.table_data : [] }
+      : { description: '', table_data: [] },
+    practical_notes: Array.isArray(parsed.practical_notes) ? parsed.practical_notes : [],
+    sources: Array.isArray(parsed.sources) ? parsed.sources : [],
+    confidence: ['high', 'medium', 'low'].includes(parsed.confidence) ? parsed.confidence : 'medium',
+    needs_clarification: parsed.needs_clarification === true,
+    out_of_scope: parsed.out_of_scope === true,
     correction_hint: parsed.correction_hint || '',
   };
 }
@@ -110,6 +141,7 @@ export async function POST(req: Request) {
         messages: messages,
         temperature: 0.3,
       });
+      console.log('generateObject succeeded');
       result = object;
     } catch (genErr: any) {
       console.warn('generateObject failed, falling back to raw Groq SDK:', genErr.message);
