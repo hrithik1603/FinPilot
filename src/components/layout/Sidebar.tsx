@@ -170,7 +170,7 @@ export function Sidebar({
       <div className="p-4 border-t border-[var(--color-border-subtle)]">
         <div className="flex items-center justify-between p-2 hover:bg-[var(--color-bg-hover)] rounded-md transition-colors">
           <div className="flex items-center gap-3">
-            <UserButton afterSignOutUrl="/" />
+            <UserButton />
             <div>
               <p className="text-sm font-medium text-white">{user?.fullName || 'Guest'}</p>
               <p className="text-xs text-[var(--color-text-muted)]">Pro Plan</p>

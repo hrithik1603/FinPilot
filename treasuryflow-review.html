@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TreasuryFlow — App Review</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300..800&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0f1117;--surface:#161b27;--surface-2:#1c2333;--surface-3:#222a3d;
+  --border:rgba(255,255,255,0.07);--text:#e2e8f0;--muted:#7c8ba1;--faint:#3d4a5e;
+  --primary:#4f8ef7;--pg:rgba(79,142,247,0.15);
+  --green:#34d399;--gg:rgba(52,211,153,0.12);
+  --yellow:#fbbf24;--yg:rgba(251,191,36,0.12);
+  --red:#f87171;--rg:rgba(248,113,113,0.12);
+  --orange:#fb923c;--purple:#a78bfa;
+  --fd:"Instrument Serif",Georgia,serif;
+  --fb:"Plus Jakarta Sans",system-ui,sans-serif;
+}
+html{scroll-behavior:smooth}
+body{font-family:var(--fb);background:var(--bg);color:var(--text);min-height:100vh;line-height:1.6;font-size:15px}
+.hdr{position:relative;overflow:hidden;padding:64px 24px 56px;text-align:center;border-bottom:1px solid var(--border)}
+.hdr::before{content:"";position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 50% -10%,rgba(79,142,247,0.12) 0%,transparent 70%);pointer-events:none}
+.badge{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--primary);background:var(--pg);border:1px solid rgba(79,142,247,0.25);padding:5px 14px;border-radius:99px;margin-bottom:24px}
+.hdr h1{font-family:var(--fd);font-size:clamp(2.4rem,5vw,4rem);font-weight:400;line-height:1.1;color:#fff;margin-bottom:10px}
+.hdr h1 span{color:var(--primary);font-style:italic}
+.hdr-sub{color:var(--muted);font-size:14px;margin-bottom:40px}
+.overall{display:inline-flex;align-items:center;gap:28px;background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:24px 36px;box-shadow:0 0 60px rgba(79,142,247,0.06)}
+.ring-wrap{position:relative;width:100px;height:100px;flex-shrink:0}
+.ring-wrap svg{transform:rotate(-90deg)}
+.rb{fill:none;stroke:var(--surface-3);stroke-width:7}
+.rf{fill:none;stroke:var(--primary);stroke-width:7;stroke-linecap:round;stroke-dasharray:283;stroke-dashoffset:283;transition:stroke-dashoffset 1.6s cubic-bezier(0.16,1,0.3,1)}
+.rl{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.rl .n{font-size:26px;font-weight:800;color:#fff;line-height:1}
+.rl .d{font-size:11px;color:var(--muted);font-weight:600}
+.ot .v{font-family:var(--fd);font-size:1.5rem;color:#fff;font-style:italic}
+.ot .c{font-size:13px;color:var(--muted);max-width:260px;line-height:1.5;margin-top:4px}
+.cnt{max-width:1100px;margin:0 auto;padding:48px 24px 80px}
+.stitle{font-size:11px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:var(--muted);margin-bottom:20px;display:flex;align-items:center;gap:10px}
+.stitle::after{content:"";flex:1;height:1px;background:var(--border)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:16px;margin-bottom:48px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:22px;transition:border-color .2s,box-shadow .2s}
+.card:hover{border-color:rgba(255,255,255,0.12);box-shadow:0 8px 32px rgba(0,0,0,.2)}
+.ch{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:14px}
+.icon{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.ct{flex:1}
+.ct h3{font-size:14px;font-weight:700;color:#fff;line-height:1.2}
+.ct p{font-size:11.5px;color:var(--muted);margin-top:2px}
+.sb{display:flex;align-items:baseline;gap:2px;flex-shrink:0}
+.sb .big{font-size:28px;font-weight:800;line-height:1}
+.sb .sl{font-size:13px;color:var(--muted);font-weight:500;margin:0 1px}
+.sb .ten{font-size:13px;color:var(--muted);font-weight:600}
+.pb{height:4px;background:var(--surface-3);border-radius:99px;overflow:hidden;margin-bottom:14px}
+.pf{height:100%;border-radius:99px;width:0;transition:width 1.2s cubic-bezier(.16,1,.3,1)}
+.bls{display:flex;flex-direction:column;gap:5px}
+.bl{display:flex;align-items:flex-start;gap:8px;font-size:12px;color:var(--muted);line-height:1.4}
+.dot{width:5px;height:5px;border-radius:50%;margin-top:5px;flex-shrink:0}
+.blue .icon{background:var(--pg);color:var(--primary)}.blue .sb .big{color:var(--primary)}.blue .pf{background:var(--primary)}.blue .dot{background:var(--primary)}
+.green .icon{background:var(--gg);color:var(--green)}.green .sb .big{color:var(--green)}.green .pf{background:var(--green)}.green .dot{background:var(--green)}
+.yellow .icon{background:var(--yg);color:var(--yellow)}.yellow .sb .big{color:var(--yellow)}.yellow .pf{background:var(--yellow)}.yellow .dot{background:var(--yellow)}
+.red .icon{background:var(--rg);color:var(--red)}.red .sb .big{color:var(--red)}.red .pf{background:var(--red)}.red .dot{background:var(--red)}
+.orange .icon{background:rgba(251,146,60,.12);color:var(--orange)}.orange .sb .big{color:var(--orange)}.orange .pf{background:var(--orange)}.orange .dot{background:var(--orange)}
+.purple .icon{background:rgba(167,139,250,.12);color:var(--purple)}.purple .sb .big{color:var(--purple)}.purple .pf{background:var(--purple)}.purple .dot{background:var(--purple)}
+.tbl{background:var(--surface);border:1px solid var(--border);border-radius:16px;overflow:hidden;margin-bottom:48px}
+.tbl table{width:100%;border-collapse:collapse}
+.tbl th{font-size:10.5px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);padding:14px 20px;text-align:left;border-bottom:1px solid var(--border);background:var(--surface-2)}
+.tbl td{padding:13px 20px;font-size:13px;border-bottom:1px solid var(--border);color:var(--text);vertical-align:middle}
+.tbl tr:last-child td{border-bottom:none}
+.tbl tr:hover td{background:var(--surface-2)}
+.tag{display:inline-flex;align-items:center;padding:3px 10px;border-radius:99px;font-size:11px;font-weight:700}
+.tg{background:var(--gg);color:var(--green);border:1px solid rgba(52,211,153,.2)}
+.ty{background:var(--yg);color:var(--yellow);border:1px solid rgba(251,191,36,.2)}
+.tr{background:var(--rg);color:var(--red);border:1px solid rgba(248,113,113,.2)}
+.tb{background:var(--pg);color:var(--primary);border:1px solid rgba(79,142,247,.2)}
+.to{background:rgba(251,146,60,.1);color:var(--orange);border:1px solid rgba(251,146,60,.2)}
+.mbw{display:flex;align-items:center;gap:10px}
+.mb{height:5px;background:var(--surface-3);border-radius:99px;width:80px;overflow:hidden}
+.mbf{height:100%;border-radius:99px}
+.vbox{background:linear-gradient(135deg,var(--surface) 0%,var(--surface-2) 100%);border:1px solid rgba(79,142,247,.2);border-radius:20px;padding:36px;margin-bottom:48px;position:relative;overflow:hidden}
+.vbox::before{content:"";position:absolute;top:0;right:0;width:300px;height:300px;background:radial-gradient(circle,rgba(79,142,247,.06) 0%,transparent 70%);pointer-events:none}
+.vbox h2{font-family:var(--fd);font-size:1.8rem;color:#fff;margin-bottom:16px;font-style:italic}
+.vbox p{color:var(--muted);font-size:14px;line-height:1.7;max-width:700px;margin-bottom:12px}
+.agrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px}
+.aitem{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px 18px;display:flex;gap:14px;align-items:flex-start}
+.anum{width:26px;height:26px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;flex-shrink:0}
+.aitem h4{font-size:13px;font-weight:700;color:#fff;margin-bottom:3px}
+.aitem p{font-size:12px;color:var(--muted);line-height:1.45}
+.footer{text-align:center;padding:24px;border-top:1px solid var(--border);font-size:12px;color:var(--faint)}
+@media(max-width:600px){.overall{flex-direction:column;text-align:center;gap:16px}.ot .c{max-width:100%}.grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="hdr">
+  <div class="badge"><svg width="8" height="8" viewBox="0 0 8 8" fill="currentColor"><circle cx="4" cy="4" r="4"/></svg> App Review &middot; April 2026</div>
+  <h1>Treasury<span>Flow</span></h1>
+  <p class="hdr-sub">Comprehensive rating across 10 dimensions &middot; Built by Ritish Oswal</p>
+  <div class="overall">
+    <div class="ring-wrap">
+      <svg width="100" height="100" viewBox="0 0 100 100">
+        <circle class="rb" cx="50" cy="50" r="45"/>
+        <circle class="rf" cx="50" cy="50" r="45" id="mainRing"/>
+      </svg>
+      <div class="rl"><span class="n">7.0</span><span class="d">/ 10</span></div>
+    </div>
+    <div class="ot">
+      <div class="v">Strong Foundations.</div>
+      <div class="c">Production-worthy architecture with a few critical accuracy gaps to patch before client validation.</div>
+    </div>
+  </div>
+</div>
+
+<div class="cnt">
+<div class="stitle">Detailed Ratings</div>
+<div class="grid">
+
+<div class="card blue">
+  <div class="ch"><div class="icon">&#x1F3D7;&#xFE0F;</div><div class="ct"><h3>Code Architecture</h3><p>Structure, separation, patterns</p></div><div class="sb"><span class="big">8.5</span><span class="sl">/</span><span class="ten">10</span></div></div>
+  <div class="pb"><div class="pf" data-w="85%"></div></div>
+  <div class="bls">
+    <div class="bl"><div class="dot"></div><span>Clean pages/components/api/utils folder separation</span></div>
+    <div class="bl"><div class="dot"></div><span>AuthContext + GlobalStateContext with proper React patterns</span></div>
+    <div class="bl"><div class="dot"></div><span>Pure math utils with zero side effects in borrowingCalculations.js</span></div>
+    <div class="bl"><div class="dot"></div><span>&#x274C; No TypeScript &mdash; risky for financial data at scale</span></div>
+    <div class="bl"><div class="dot"></div><span>&#x274C; Some page files are monolithically large (77KB MF, 51KB Calendar)</span></div>
+  </div>
+</div>
+
+<div class="card green">
+  <div class="ch"><div class="icon">&#x2705;</div><div class="ct"><h3>Feature Completeness</h3><p>Module coverage vs enterprise TMS</p></div><div class="sb"><span class="big">8.0</span><span class="sl">/</span><span class="ten">10</span></div></div>
+  <div class="pb"><div class="pf" data-w="80%"></div></div>
+  <div class="bls">
+    <div class="bl"><div class="dot"></div><span>10 live modules: FDs, Borrowings, MFs, Liquidity, Covenants, Calendar, OI, Dashboard + more</span></div>
+    <div class="bl"><div class="dot"></div><span>Maker-Checker approval workflow is genuine enterprise-grade</span></div>
+    <div class="bl"><div class="dot"></div><span>Live benchmark rates: SOFR, Repo, G-Sec, MCLR</span></div>
+    <div class="bl"><div class="dot"></div><span>&#x274C; FX Management is a placeholder, not functional</span></div>
+    <div class="bl"><div class="dot"></div><span>&#x274C; No audit-ready PDF export module</span></div>
+  </div>
+</div>
+
+<div class="card yellow">
+  <div class="ch"><div class="icon">&#x1F9EE;</div><div class="ct"><h3>Calculation Accuracy</h3><p>Financial formulas &amp; edge cases</p></div><div class="sb"><span class="big">6.5</span><span class="sl">/</span><span class="ten">10</span></div></div>
+  <div class="pb"><div class="pf" data-w="65%"></div></div>
+  <div class="bls">
+    <div class="bl"><div class="dot"></div><span>&#x2705; EMI formula P&middot;r&middot;(1+r)^n/((1+r)^n&minus;1) is correct</span></div>
+    <div class="bl"><div class="dot"></div><span>&#x2705; FD compound interest with revision tracking is accurate</span></div>
+    <div class="bl"><div class="dot"></div><span>&#x2705; MF market value = units &times; latest NAV is correct</span></div>
+    <div class="bl"><div class="dot"></div><span>&#x274C; Quick Ratio fallback divisor of 1 shows wildly inflated number</span></div>
+    <div class="bl"><div class="dot"></div><span>&#x274C; 30/360 day2 clamping bug in borrowing interest calc</span></div>
+    <div class="bl"><div class="dot"></div><span>&#x274C; OI weights missing &mdash; portfolio % won't sum to 100%</span></div>
+  </div>
+</div>
+
+<div class="card blue">
+  <div class="ch"><div class="icon">&#x1F3A8;</div><div class="ct"><h3>UI / UX Design</h3><p>Visuals, interactions, consistency</p></div><div class="sb"><span class="big">8.0</span><span class="sl">/</span><span class="ten">10</span></div></div>
+  <div class="pb"><div class="pf" data-w="80%"></div></div>
+  <div class="bls">
+    <div class="bl"><div class="dot"></div><span>Material Symbols + Plus Jakarta Sans = clean enterprise look</span></div>
+    <div class="bl"><div class="dot"></div><span>Branded animated loading overlay with chart-bar animation</span></div>
+    <div class="bl"><div class="dot"></div><span>Bento-style portfolio allocation grid is distinctive</span></div>
+    <div class="bl"><div class="dot"></div><span>&#x274C; Critical Alerts &amp; Invest Surplus are hardcoded strings</span></div>
+    <div class="bl"><div class="dot"></div><span>&#x274C; Empty states likely minimal across several modules</span></div>
+  </div>
+</div>
+
+<div class="card green">
+  <div class="ch"><div class="icon">&#x1F510;</div><div class="ct"><h3>Auth &amp; Security</h3><p>Access control, org isolation, approval</p></div><div class="sb"><span class="big">8.5</span><span class="sl">/</span><span class="ten">10</span></div></div>
+  <div class="pb"><div class="pf" data-w="85%"></div></div>
+  <div class="bls">
+    <div class="bl"><div class="dot"></div><span>Supabase auth with org_id isolation on every DB query</span></div>
+    <div class="bl"><div class="dot"></div><span>activeOrganization.status === "Authorized" gate on login</span></div>
+    <div class="bl"><div class="dot"></div><span>Maker-Checker = built-in 4-eyes principle for all mutations</span></div>
+    <div class="bl"><div class="dot"></div><span>ForgotPassword + Signup flows fully implemented</span></div>
+    <div class="bl"><div class="dot"></div><span>&#x274C; No role-based access granularity (Viewer/Maker/Checker/Admin)</span></div>
+  </div>
+</div>
+
+<div class="card purple">
+  <div class="ch"><div class="icon">&#x1F5C4;&#xFE0F;</div><div class="ct"><h3>Database Design</h3><p>Schema, RPC functions, data modeling</p></div><div class="sb"><span class="big">7.5</span><span class="sl">/</span><span class="ten">10</span></div></div>
+  <div class="pb"><div class="pf" data-w="75%"></div></div>
+  <div class="bls">
+    <div class="bl"><div class="dot"></div><span>RPC get_dashboard_aggregates offloads heavy compute to Postgres</span></div>
+    <div class="bl"><div class="dot"></div><span>borrowing_schedules, nav_history, projected_cash_flows show depth</span></div>
+    <div class="bl"><div class="dot"></div><span>Audit log table for compliance trail</span></div>
+    <div class="bl"><div class="dot"></div><span>&#x274C; No documented schema migrations or seed data</span></div>
+    <div class="bl"><div class="dot"></div><span>&#x274C; Row-Level Security (RLS) policies not documented</span></div>
+  </div>
+</div>
+
+<div class="card yellow">
+  <div class="ch"><div class="icon">&#x26A1;</div><div class="ct"><h3>Performance</h3><p>Load times, pagination, resilience</p></div><div class="sb"><span class="big">7.0</span><span class="sl">/</span><span class="ten">10</span></div></div>
+  <div class="pb"><div class="pf" data-w="70%"></div></div>
+  <div class="bls">
+    <div class="bl"><div class="dot"></div><span>Auto-paginated Supabase fetches bypass 1000-row PostgREST limit</span></div>
+    <div class="bl"><div class="dot"></div><span>useMemo on KPI arrays and cash flow data in Dashboard</span></div>
+    <div class="bl"><div class="dot"></div><span>Market data auto-refreshes every 5 minutes</span></div>
+    <div class="bl"><div class="dot"></div><span>&#x274C; No React.lazy() / code splitting on 77KB+ page components</span></div>
+    <div class="bl"><div class="dot"></div><span>&#x274C; No Error Boundaries &mdash; one crash takes down the whole app</span></div>
+  </div>
+</div>
+
+<div class="card green">
+  <div class="ch"><div class="icon">&#x1F4F1;</div><div class="ct"><h3>Mobile Responsiveness</h3><p>Layout, tables, drawers, touch</p></div><div class="sb"><span class="big">7.5</span><span class="sl">/</span><span class="ten">10</span></div></div>
+  <div class="pb"><div class="pf" data-w="75%"></div></div>
+  <div class="bls">
+    <div class="bl"><div class="dot"></div><span>Latest commit (Apr 26) specifically optimized mobile layouts</span></div>
+    <div class="bl"><div class="dot"></div><span>snap-x horizontal KPI scroll gives smooth mobile navigation</span></div>
+    <div class="bl"><div class="dot"></div><span>Responsive grid with lg:col-span breakpoints throughout</span></div>
+    <div class="bl"><div class="dot"></div><span>&#x274C; Data tables on mobile need card-view fallback</span></div>
+    <div class="bl"><div class="dot"></div><span>&#x274C; Touch targets on dense tables need 44px minimum verification</span></div>
+  </div>
+</div>
+
+<div class="card orange">
+  <div class="ch"><div class="icon">&#x1F4CA;</div><div class="ct"><h3>Financial Domain Logic</h3><p>Treasury concepts, Indian market accuracy</p></div><div class="sb"><span class="big">7.5</span><span class="sl">/</span><span class="ten">10</span></div></div>
+  <div class="pb"><div class="pf" data-w="75%"></div></div>
+  <div class="bls">
+    <div class="bl"><div class="dot"></div><span>Actual/365 basis correct for Indian debt markets (RBI standard)</span></div>
+    <div class="bl"><div class="dot"></div><span>FPVI schedule correctly models step-down amortizing loans</span></div>
+    <div class="bl"><div class="dot"></div><span>Covenant compliance with lte/gte direction logic is solid</span></div>
+    <div class="bl"><div class="dot"></div><span>&#x274C; Net Liquidity doesn't deduct OD drawn amounts correctly</span></div>
+    <div class="bl"><div class="dot"></div><span>&#x274C; TDS on FD interest not modeled &mdash; critical for Indian compliance</span></div>
+  </div>
+</div>
+
+<div class="card red">
+  <div class="ch"><div class="icon">&#x1F4DD;</div><div class="ct"><h3>Documentation &amp; DevOps</h3><p>README, setup, deployment, changelog</p></div><div class="sb"><span class="big">2.5</span><span class="sl">/</span><span class="ten">10</span></div></div>
+  <div class="pb"><div class="pf" data-w="25%"></div></div>
+  <div class="bls">
+    <div class="bl"><div class="dot"></div><span>&#x274C; README is the default Vite template &mdash; says nothing about TreasuryFlow</span></div>
+    <div class="bl"><div class="dot"></div><span>&#x274C; No schema docs, no .env setup guide, no deployment instructions</span></div>
+    <div class="bl"><div class="dot"></div><span>&#x274C; Admin scripts (add_user_to_sg001.js) committed to repo root</span></div>
+    <div class="bl"><div class="dot"></div><span>&#x2705; Commit messages use descriptive feat/fix conventions</span></div>
+    <div class="bl"><div class="dot"></div><span>&#x2705; .env.example file exists &mdash; good security practice</span></div>
+  </div>
+</div>
+
+</div><!-- /grid -->
+
+<div class="stitle">Scorecard Summary</div>
+<div class="tbl">
+<table>
+<thead><tr><th>Dimension</th><th>Score</th><th>Progress</th><th>Top Fix</th><th>Status</th></tr></thead>
+<tbody>
+<tr><td>&#x1F3D7; Code Architecture</td><td><strong style="color:#4f8ef7">8.5</strong></td><td><div class="mbw"><div class="mb"><div class="mbf" style="width:85%;background:#4f8ef7"></div></div></div></td><td>Add TypeScript, split large files</td><td><span class="tag tb">Strong</span></td></tr>
+<tr><td>&#x2705; Feature Completeness</td><td><strong style="color:#34d399">8.0</strong></td><td><div class="mbw"><div class="mb"><div class="mbf" style="width:80%;background:#34d399"></div></div></div></td><td>Build FX module, add export</td><td><span class="tag tg">Strong</span></td></tr>
+<tr><td>&#x1F9EE; Calculation Accuracy</td><td><strong style="color:#fbbf24">6.5</strong></td><td><div class="mbw"><div class="mb"><div class="mbf" style="width:65%;background:#fbbf24"></div></div></div></td><td>Fix quickRatio, 30/360, OI weights</td><td><span class="tag ty">Needs Work</span></td></tr>
+<tr><td>&#x1F3A8; UI / UX Design</td><td><strong style="color:#4f8ef7">8.0</strong></td><td><div class="mbw"><div class="mb"><div class="mbf" style="width:80%;background:#4f8ef7"></div></div></div></td><td>Remove hardcoded alerts</td><td><span class="tag tb">Strong</span></td></tr>
+<tr><td>&#x1F510; Auth &amp; Security</td><td><strong style="color:#34d399">8.5</strong></td><td><div class="mbw"><div class="mb"><div class="mbf" style="width:85%;background:#34d399"></div></div></div></td><td>Add role-based access control</td><td><span class="tag tg">Strong</span></td></tr>
+<tr><td>&#x1F5C4; Database Design</td><td><strong style="color:#a78bfa">7.5</strong></td><td><div class="mbw"><div class="mb"><div class="mbf" style="width:75%;background:#a78bfa"></div></div></div></td><td>Document RLS policies &amp; schema</td><td><span class="tag tb">Good</span></td></tr>
+<tr><td>&#x26A1; Performance</td><td><strong style="color:#fbbf24">7.0</strong></td><td><div class="mbw"><div class="mb"><div class="mbf" style="width:70%;background:#fbbf24"></div></div></div></td><td>Add lazy loading + Error Boundaries</td><td><span class="tag ty">Needs Work</span></td></tr>
+<tr><td>&#x1F4F1; Mobile</td><td><strong style="color:#34d399">7.5</strong></td><td><div class="mbw"><div class="mb"><div class="mbf" style="width:75%;background:#34d399"></div></div></div></td><td>Table card-view on mobile</td><td><span class="tag tg">Good</span></td></tr>
+<tr><td>&#x1F4CA; Financial Logic</td><td><strong style="color:#fb923c">7.5</strong></td><td><div class="mbw"><div class="mb"><div class="mbf" style="width:75%;background:#fb923c"></div></div></div></td><td>Model TDS on FD, fix OD balance</td><td><span class="tag to">Good</span></td></tr>
+<tr><td>&#x1F4DD; Documentation</td><td><strong style="color:#f87171">2.5</strong></td><td><div class="mbw"><div class="mb"><div class="mbf" style="width:25%;background:#f87171"></div></div></div></td><td>Rewrite README immediately</td><td><span class="tag tr">Critical</span></td></tr>
+<tr style="background:rgba(79,142,247,0.04)"><td><strong style="color:#fff">Overall Weighted Score</strong></td><td><strong style="color:#4f8ef7;font-size:16px">7.0 / 10</strong></td><td><div class="mbw"><div class="mb"><div class="mbf" style="width:70%;background:linear-gradient(90deg,#4f8ef7,#a78bfa)"></div></div></div></td><td>&mdash;</td><td><span class="tag tb">Production-Ready MVP</span></td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="vbox">
+  <h2>The Honest Verdict</h2>
+  <p>TreasuryFlow is a genuinely impressive solo-built product. Very few developers &mdash; let alone student developers &mdash; build a full treasury management system with maker-checker workflows, live benchmark data, dynamic borrowing schedules, and NAV-based mutual fund valuation. The architecture is clean and the financial intuition is mostly sound.</p>
+  <p>The app scores <strong style="color:#4f8ef7">7.0 / 10</strong> overall. The single biggest drag is the <strong style="color:#f87171">2.5 / 10 documentation</strong> and the <strong style="color:#fbbf24">calculation accuracy gaps</strong> (Quick Ratio bug, hardcoded alerts, missing OI weights). These are not feature gaps &mdash; they are credibility killers in a client validation conversation. Fix those three things and the app is an honest <strong style="color:#34d399">8.0 / 10</strong>.</p>
+  <p>Compared to paid alternatives like CashAnalytics (~$500/mo) or Kyriba (~$2,000/mo), TreasuryFlow already matches 70&ndash;80% of core feature coverage for the Indian SME market. That's remarkable for a v0 product built by one person.</p>
+</div>
+
+<div class="stitle">Top 5 Actions to Reach 8.5 / 10</div>
+<div class="agrid">
+  <div class="aitem">
+    <div class="anum" style="background:rgba(248,113,113,.15);color:#f87171">1</div>
+    <div><h4>Fix Quick Ratio Bug</h4><p>Replace the hardcoded divisor of 1 with 'N/A' when no 30-day schedules exist. 1-line fix, highest-visibility metric on the Liquidity page.</p></div>
+  </div>
+  <div class="aitem">
+    <div class="anum" style="background:rgba(248,113,113,.15);color:#f87171">2</div>
+    <div><h4>Remove Hardcoded Alerts</h4><p>Make Critical Alerts and Invest Surplus dynamic, or remove them entirely. Hardcoded demo data is the first thing any client catches in a live demo.</p></div>
+  </div>
+  <div class="aitem">
+    <div class="anum" style="background:rgba(251,191,36,.15);color:#fbbf24">3</div>
+    <div><h4>Rewrite the README</h4><p>Add project overview, tech stack, Supabase setup, .env vars, and a screenshot. Currently it is the default Vite template &mdash; a critical red flag for validation.</p></div>
+  </div>
+  <div class="aitem">
+    <div class="anum" style="background:rgba(251,191,36,.15);color:#fbbf24">4</div>
+    <div><h4>Add otherInvestments Weight</h4><p>Add oiWeight to portfolio allocation so all asset class weights correctly sum to 100%. Simple fix in dashboardData.js.</p></div>
+  </div>
+  <div class="aitem">
+    <div class="anum" style="background:rgba(79,142,247,.15);color:#4f8ef7">5</div>
+    <div><h4>Fix 30/360 Day Clamping</h4><p>In borrowingCalculations.js, clamp both d1 and d2 independently per ISDA 30/360 convention. Affects all fixed-rate borrowing interest calculations.</p></div>
+  </div>
+</div>
+</div>
+
+<div class="footer">TreasuryFlow App Review &middot; Generated April 26, 2026 &middot; Perplexity AI</div>
+
+<script>
+(function(){
+  const bars = document.querySelectorAll('.pf');
+  const obs = new IntersectionObserver(entries=>{
+    entries.forEach(e=>{
+      if(e.isIntersecting){
+        e.target.style.width = e.target.getAttribute('data-w');
+        obs.unobserve(e.target);
+      }
+    });
+  },{threshold:0.3});
+  bars.forEach(b=>obs.observe(b));
+  setTimeout(()=>{
+    const r = document.getElementById('mainRing');
+    if(r) r.style.strokeDashoffset='84.9';
+  }, 400);
+})();
+</script>
+</body>
+</html>
