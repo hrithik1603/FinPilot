@@ -215,18 +215,56 @@ function AnimatedStructuredContent({ data, animate }: { data: StructuredResponse
 
   return (
     <>
-      {/* Title & Summary */}
+      {/* Title, Summary & Badges */}
       <div className="flex items-start justify-between mb-4">
         <div>
-          <h2 className="text-xl font-bold text-white mb-2">
-            {title.displayed}
-            {animate && !title.isDone && <span className="inline-block w-0.5 h-5 bg-white ml-0.5 animate-pulse" />}
-          </h2>
+          <div className="flex items-center gap-2 mb-2">
+            <h2 className="text-xl font-bold text-white">
+              {title.displayed}
+              {animate && !title.isDone && <span className="inline-block w-0.5 h-5 bg-white ml-0.5 animate-pulse" />}
+            </h2>
+            {/* Badges */}
+            {data.confidence && phase >= 0 && (
+              <span className={`px-2 py-0.5 text-[10px] font-bold uppercase rounded border animate-fadeIn ${
+                data.confidence === 'high' ? 'bg-green-500/10 text-green-400 border-green-500/20' :
+                data.confidence === 'medium' ? 'bg-yellow-500/10 text-yellow-400 border-yellow-500/20' :
+                'bg-red-500/10 text-red-400 border-red-500/20'
+              }`}>
+                {data.confidence} Confidence
+              </span>
+            )}
+            {data.out_of_scope && (
+              <span className="px-2 py-0.5 text-[10px] font-bold uppercase rounded border bg-purple-500/10 text-purple-400 border-purple-500/20 animate-fadeIn">
+                Out of Scope
+              </span>
+            )}
+          </div>
+          
           {phase >= 1 && (
-            <p className="text-sm text-[var(--color-text-secondary)] animate-fadeIn">
-              {summary.displayed}
-              {animate && !summary.isDone && <span className="inline-block w-0.5 h-4 bg-[var(--color-text-secondary)] ml-0.5 animate-pulse" />}
-            </p>
+            <div className="space-y-3 animate-fadeIn">
+              <p className="text-sm text-[var(--color-text-secondary)]">
+                {summary.displayed}
+                {animate && !summary.isDone && <span className="inline-block w-0.5 h-4 bg-[var(--color-text-secondary)] ml-0.5 animate-pulse" />}
+              </p>
+              
+              {data.needs_clarification && (
+                <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-3 flex items-start gap-3">
+                  <span className="text-blue-400 mt-0.5">ℹ️</span>
+                  <p className="text-sm text-blue-200">
+                    This query requires clarification. Please provide more details so I can give you an accurate answer.
+                  </p>
+                </div>
+              )}
+              
+              {data.confidence === 'low' && data.correction_hint && (
+                <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-3 flex items-start gap-3">
+                  <span className="text-red-400 mt-0.5">⚠️</span>
+                  <p className="text-sm text-red-200">
+                    <strong>Low Confidence:</strong> {data.correction_hint}
+                  </p>
+                </div>
+              )}
+            </div>
           )}
         </div>
       </div>

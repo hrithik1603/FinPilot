@@ -18,6 +18,10 @@ export type StructuredResponse = {
   };
   practical_notes: string[];
   sources: string[];
+  confidence: 'high' | 'medium' | 'low';
+  needs_clarification?: boolean;
+  out_of_scope?: boolean;
+  correction_hint?: string;
 };
 
 export type Message = {

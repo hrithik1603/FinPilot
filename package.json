@@ -9,11 +9,13 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@ai-sdk/groq": "^3.0.35",
     "@clerk/nextjs": "^7.2.7",
     "@google/genai": "^1.50.1",
     "@supabase/supabase-js": "^2.104.1",
     "@tavily/core": "^0.7.2",
     "@upstash/redis": "^1.37.0",
+    "ai": "^6.0.168",
     "clsx": "^2.1.1",
     "groq-sdk": "^1.1.2",
     "lucide-react": "^1.11.0",
@@ -21,7 +23,8 @@
     "pdf-parse": "^2.4.5",
     "react": "19.2.4",
     "react-dom": "19.2.4",
-    "tailwind-merge": "^3.5.0"
+    "tailwind-merge": "^3.5.0",
+    "zod": "^4.3.6"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
