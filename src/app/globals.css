@@ -1,0 +1,63 @@
+@import "tailwindcss";
+
+@theme {
+  --color-brand-500: #3b82f6; /* Blue for brand */
+  --color-brand-600: #2563eb;
+  
+  --color-bg-main: #0B0E14; /* Deep dark blue/black background */
+  --color-bg-sidebar: #121620; /* Slightly lighter for sidebar */
+  --color-bg-panel: #1A1F2C; /* Panels and cards */
+  --color-bg-hover: #232938;
+  
+  --color-border-subtle: rgba(255, 255, 255, 0.05);
+  --color-border-default: rgba(255, 255, 255, 0.1);
+  
+  --color-text-primary: #F8FAFC;
+  --color-text-secondary: #94A3B8;
+  --color-text-muted: #64748B;
+}
+
+:root {
+  --background: #0B0E14;
+  --foreground: #F8FAFC;
+}
+
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #232938;
+  border-radius: 10px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #334155;
+}
+
+/* ─── Chat Animations ─── */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.4s ease-out forwards;
+}
+.animate-slideUp {
+  animation: slideUp 0.35s ease-out forwards;
+}
